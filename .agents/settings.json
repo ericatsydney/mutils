@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "defaultAgent": "developer",
+  "agents": [
+    {
+      "id": "developer",
+      "name": "Developer",
+      "path": ".agents/developer",
+      "instructions": ".agents/developer/AGENTS.md",
+      "description": "Implementation, debugging, refactoring, tests, and code review."
+    },
+    {
+      "id": "ui-designer",
+      "name": "UI Designer",
+      "path": ".agents/ui-designer",
+      "instructions": ".agents/ui-designer/AGENTS.md",
+      "description": "Interface design, interaction flows, visual systems, and frontend polish."
+    },
+    {
+      "id": "marketing-research",
+      "name": "Marketing Research",
+      "path": ".agents/marketing-research",
+      "instructions": ".agents/marketing-research/AGENTS.md",
+      "description": "Market, audience, competitor, positioning, and messaging research."
+    }
+  ]
+}
