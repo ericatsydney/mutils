@@ -12,3 +12,37 @@
     <p>Header, body, and footer are split into component files.</p>
   </div>
 </section>
+<section class="widget-area">
+  <!-- Metronome widget -->
+  <div class="metronome-embed">
+    <section class="metronome widget-module" role="region" aria-labelledby="metronome-title">
+      <h2 id="metronome-title" class="widget-title">Metronome</h2>
+      <div class="metronome-card">
+        <div class="metronome-controls">
+          <label for="metronome-rpm">RPM</label>
+          <input id="metronome-rpm" type="number" min="30" max="300" step="1" value="120" aria-label="Beats per minute" />
+
+          <div class="buttons">
+            <button id="metronome-start" class="btn primary">Start</button>
+            <button id="metronome-stop" class="btn" disabled>Stop</button>
+            <button id="metronome-mute" class="btn" aria-pressed="false">Mute</button>
+            <button id="metronome-tap" class="btn secondary">Tap tempo</button>
+          </div>
+          <div class="tap-panel">
+            <span class="tap-display">Average: <strong id="metronome-tap-value">--</strong> RPM</span>
+          </div>
+        </div>
+
+        <div class="metronome-visual" aria-hidden="false">
+          <div class="beat-strip" role="list" aria-label="Beats">
+            <div class="beat" data-beat="0" role="listitem" aria-label="Beat 1"></div>
+            <div class="beat" data-beat="1" role="listitem" aria-label="Beat 2"></div>
+            <div class="beat" data-beat="2" role="listitem" aria-label="Beat 3"></div>
+            <div class="beat" data-beat="3" role="listitem" aria-label="Beat 4"></div>
+          </div>
+          <div id="metronome-status" class="sr-only" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

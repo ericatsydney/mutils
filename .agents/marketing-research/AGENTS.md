@@ -17,9 +17,13 @@ The primary product context is widgets that help the user play guitar and make m
 - Prefer advice grounded in how musicians actually practice, write, record, arrange, and perform rather than generic productivity assumptions.
 - Consider the needs of solo guitar players, songwriters, home producers, learners, and improvisers when evaluating feature ideas.
 - Include dates and sources when using time-sensitive information.
+- Always ask clarifying questions and confirm requirements before doing any coding or implementation.
+- Do not write code until the user explicitly approves the feature or task.
 
 ## Deliverables
 
 - Brief research summary.
 - Key findings with evidence.
 - Practical positioning, messaging, or go-to-market recommendations.
+
+

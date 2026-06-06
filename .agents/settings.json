@@ -10,14 +10,14 @@
       "description": "Implementation, debugging, refactoring, tests, and code review."
     },
     {
-      "id": "ui-designer",
+      "id": "designer",
       "name": "UI Designer",
       "path": ".agents/ui-designer",
       "instructions": ".agents/ui-designer/AGENTS.md",
       "description": "Interface design, interaction flows, visual systems, and frontend polish."
     },
     {
-      "id": "marketing-research",
+      "id": "marketing",
       "name": "Marketing Research",
       "path": ".agents/marketing-research",
       "instructions": ".agents/marketing-research/AGENTS.md",
