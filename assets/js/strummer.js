@@ -1,4 +1,4 @@
-﻿// Guitar strummer widget â€” 8-note pattern player with up/down/mute toggle per note
+// Guitar strummer widget — 8-note pattern player with up/down/mute toggle per note
 ;(function(){
   let audioCtx = null;
   let timerID = null;
@@ -40,16 +40,16 @@
           arr.forEach((dir, i) => {
             if(i < noteBtns.length){
               noteBtns[i].dataset.strum = dir;
-              if(dir === "up") noteBtns[i].textContent = "â–²";
-              else if(dir === "down") noteBtns[i].textContent = "â–¼";
-              else noteBtns[i].textContent = "â€”";
+              if(dir === "up") noteBtns[i].textContent = "▲";
+              else if(dir === "down") noteBtns[i].textContent = "▼";
+              else noteBtns[i].textContent = "—";
             }
           });
         }
       }
     }catch(e){}
 
-    // Toggle note direction on click: down â†’ up â†’ mute â†’ down...
+    // Toggle note direction on click: down → up → mute → down...
     noteBtns.forEach(btn => {
       btn.addEventListener("click", function(){
         if(isRunning) return;
@@ -59,9 +59,9 @@
         else if(cur === "up") next = "mute";
         else next = "down";
         this.dataset.strum = next;
-        if(next === "up") this.textContent = "â–²";
-        else if(next === "down") this.textContent = "â–¼";
-        else this.textContent = "â€”";
+        if(next === "up") this.textContent = "▲";
+        else if(next === "down") this.textContent = "▼";
+        else this.textContent = "—";
         const pat = noteBtns.map(b => b.dataset.strum);
         try{ localStorage.setItem("strummer-pattern", JSON.stringify(pat)); }catch(e){}
       });
@@ -71,9 +71,9 @@
     noteBtns.forEach((btn, i) => {
       if(!btn.dataset.strum) btn.dataset.strum = defaultPattern[i];
       const dir = btn.dataset.strum;
-      if(dir === "up") btn.textContent = "â–²";
-      else if(dir === "down") btn.textContent = "â–¼";
-      else btn.textContent = "â€”";
+      if(dir === "up") btn.textContent = "▲";
+      else if(dir === "down") btn.textContent = "▼";
+      else btn.textContent = "—";
     });
 
     // Strum sound: "da" for down, "di" for up
@@ -85,11 +85,11 @@
       // Down = lower pitch (da), Up = higher pitch (di)
       if(strumDir === "down"){
         osc.type = "triangle";
-        osc.frequency.setValueAtTime(220, time);       // A3 â€” "da"
+        osc.frequency.setValueAtTime(220, time);       // A3 — "da"
         osc.frequency.linearRampToValueAtTime(180, time + 0.04);
       } else {
         osc.type = "triangle";
-        osc.frequency.setValueAtTime(440, time);       // A4 â€” "di"
+        osc.frequency.setValueAtTime(440, time);       // A4 — "di"
         osc.frequency.linearRampToValueAtTime(360, time + 0.04);
       }
 
@@ -130,8 +130,8 @@
         const eighth = (currentStep % 2) + 1;
         if(statusEl){
           const s = noteBtns[currentStep]?.dataset.strum;
-          const sound = s === "up" ? "di" : s === "down" ? "da" : "â€”";
-          statusEl.textContent = `Beat ${beatNum} â€” note ${eighth}/8 Â· ${sound}`;
+          const sound = s === "up" ? "di" : s === "down" ? "da" : "—";
+          statusEl.textContent = `Beat ${beatNum} — note ${eighth}/8 · ${sound}`;
         }
         nextNote();
       }
@@ -143,15 +143,17 @@
       if(metronomeRpmInput){
         tempo = clampBPM(Number(metronomeRpmInput.value));
       }
-      audioCtx.resume().then(() => {
-        isRunning = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        currentStep = 0;
-        nextNoteTime = audioCtx.currentTime + 0.05;
-        timerID = window.setInterval(scheduler, lookahead);
-        if(statusEl) statusEl.textContent = `Playing at ${tempo} BPM`;
-      });
+      // Auto-resume AudioContext (required after user gesture in modern browsers)
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume();
+      }
+      isRunning = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      currentStep = 0;
+      nextNoteTime = audioCtx.currentTime + 0.05;
+      timerID = window.setInterval(scheduler, lookahead);
+      if(statusEl) statusEl.textContent = `Playing at ${tempo} BPM`;
     }
 
     function stop(){
@@ -186,13 +188,20 @@
       bindAndInit();
       return;
     }
-    const obs = new MutationObserver(function(){
-      if(document.body && document.body.dataset && document.body.dataset.ready === "true"){
-        obs.disconnect();
-        bindAndInit();
+    const obs = new MutationObserver(function(mutations){
+      for(let i = 0; i < mutations.length; i++){
+        if(mutations[i].type === "attributes" && mutations[i].attributeName === "data-ready"){
+          if(document.body.dataset.ready === "true"){
+            obs.disconnect();
+            bindAndInit();
+            return;
+          }
+        }
       }
     });
-    if(document.body) obs.observe(document.body, { attributes: true, attributeFilter: ["data-ready"] });
+    if(document.body){
+      obs.observe(document.body, { attributes: true, attributeFilter: ["data-ready"] });
+    }
     window.addEventListener("load", function(){
       if(!document.body.dataset || document.body.dataset.ready !== "true") bindAndInit();
     }, { once: true });
