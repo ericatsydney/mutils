@@ -1,4 +1,4 @@
-;(function(){
+﻿;(function(){
   const report = document.getElementById("test-report");
   const summary = document.getElementById("test-summary");
   let passCount = 0;
@@ -49,22 +49,30 @@
       var stopBtn = document.getElementById("strum-stop");
       assert(!!startBtn && !!stopBtn, "Start and Stop buttons should exist");
 
-      // Test 6: Click toggles down -> up -> mute -> down
+      // Test 6: Click toggles down -> up -> mute -> down&down -> down&up -> down
       var firstBtn = noteBtns[0];
       var initDir = firstBtn.dataset.strum;
       assert(initDir === "down", "First button should start as down, got: " + initDir);
 
       firstBtn.click();
-      assert(firstBtn.dataset.strum === "up", "After 1 click: should be up, got: " + firstBtn.dataset.strum);
-      assert(firstBtn.textContent === "\u25B2", "Up state icon: should be \u25B2, got: " + firstBtn.textContent);
+      assert(firstBtn.dataset.strum === "up", "Click 1: should be up, got: " + firstBtn.dataset.strum);
+      assert(firstBtn.textContent === "\u25B2", "Click 1 icon: should be \u25B2, got: " + firstBtn.textContent);
 
       firstBtn.click();
-      assert(firstBtn.dataset.strum === "mute", "After 2 clicks: should be mute, got: " + firstBtn.dataset.strum);
-      assert(firstBtn.textContent === "\u2014", "Mute state icon: should be \u2014, got: " + firstBtn.textContent);
+      assert(firstBtn.dataset.strum === "mute", "Click 2: should be mute, got: " + firstBtn.dataset.strum);
+      assert(firstBtn.textContent === "\u2014", "Click 2 icon: should be \u2014, got: " + firstBtn.textContent);
 
       firstBtn.click();
-      assert(firstBtn.dataset.strum === "down", "After 3 clicks: should be back to down, got: " + firstBtn.dataset.strum);
-      assert(firstBtn.textContent === "\u25BC", "Down state icon: should be \u25BC, got: " + firstBtn.textContent);
+      assert(firstBtn.dataset.strum === "down&down", "Click 3: should be down&down, got: " + firstBtn.dataset.strum);
+      assert(firstBtn.textContent === "\u25BC\u25BC", "Click 3 icon: should be \u25BC\u25BC, got: " + firstBtn.textContent);
+
+      firstBtn.click();
+      assert(firstBtn.dataset.strum === "down&up", "Click 4: should be down&up, got: " + firstBtn.dataset.strum);
+      assert(firstBtn.textContent === "\u25BC\u25B2", "Click 4 icon: should be \u25BC\u25B2, got: " + firstBtn.textContent);
+
+      firstBtn.click();
+      assert(firstBtn.dataset.strum === "down", "Click 5: should be back to down, got: " + firstBtn.dataset.strum);
+      assert(firstBtn.textContent === "\u25BC", "Click 5 icon: should be \u25BC, got: " + firstBtn.textContent);
 
       // Test 7: _strummer exposed
       assert(!!window._strummer, "window._strummer should be exposed");

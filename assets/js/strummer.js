@@ -1,4 +1,4 @@
-// Guitar strummer widget — 8-note pattern player with up/down/mute toggle per note
+﻿// Guitar strummer widget — 8-note pattern player with up/down/mute toggle per note
 ;(function(){
   let audioCtx = null;
   let timerID = null;
@@ -12,6 +12,9 @@
   // Default pattern: D, D, U, U, D, U, D, U (basic 4/4 strumming)
   const defaultPattern = ["down","down","up","up","down","up","down","up"];
 
+  // 5-state icon lookup
+  var iconLookup = { down: "\u25BC", up: "\u25B2", mute: "\u2014", "down&down": "\u25BC\u25BC", "down&up": "\u25BC\u25B2" };
+
   function clampBPM(v){ return Math.max(40, Math.min(240, Math.round(v||120))); }
 
   function initAudio(){
@@ -22,7 +25,6 @@
     const metronomeRpmInput = document.getElementById("metronome-rpm");
     const startBtn = document.getElementById("strum-start");
     const stopBtn = document.getElementById("strum-stop");
-    const statusEl = document.getElementById("strum-status");
     const noteBtns = Array.from(document.querySelectorAll(".strum-note-btn"));
     const noteWraps = Array.from(document.querySelectorAll(".strum-note"));
 
@@ -40,28 +42,23 @@
           arr.forEach((dir, i) => {
             if(i < noteBtns.length){
               noteBtns[i].dataset.strum = dir;
-              if(dir === "up") noteBtns[i].textContent = "▲";
-              else if(dir === "down") noteBtns[i].textContent = "▼";
-              else noteBtns[i].textContent = "—";
+              noteBtns[i].textContent = iconLookup[dir] || "\u25BC";
             }
           });
         }
       }
     }catch(e){}
 
-    // Toggle note direction on click: down → up → mute → down...
+    // Toggle note direction on click: down → up → mute → down&down → down&up → down...
     noteBtns.forEach(btn => {
       btn.addEventListener("click", function(){
         if(isRunning) return;
         const cur = this.dataset.strum || defaultPattern[noteBtns.indexOf(this)];
-        let next;
-        if(cur === "down") next = "up";
-        else if(cur === "up") next = "mute";
-        else next = "down";
+        // 5-state lookup table
+        var nextLookup = { down: "up", up: "mute", mute: "down&down", "down&down": "down&up", "down&up": "down" };
+        var next = nextLookup[cur] || "down";
         this.dataset.strum = next;
-        if(next === "up") this.textContent = "▲";
-        else if(next === "down") this.textContent = "▼";
-        else this.textContent = "—";
+        this.textContent = iconLookup[next] || "\u25BC";
         const pat = noteBtns.map(b => b.dataset.strum);
         try{ localStorage.setItem("strummer-pattern", JSON.stringify(pat)); }catch(e){}
       });
@@ -71,9 +68,7 @@
     noteBtns.forEach((btn, i) => {
       if(!btn.dataset.strum) btn.dataset.strum = defaultPattern[i];
       const dir = btn.dataset.strum;
-      if(dir === "up") btn.textContent = "▲";
-      else if(dir === "down") btn.textContent = "▼";
-      else btn.textContent = "—";
+      btn.textContent = iconLookup[dir] || "\u25BC";
     });
 
     // Strum sound: "da" for down, "di" for up
@@ -111,7 +106,13 @@
 
     function scheduleNote(stepIndex, time){
       const dir = noteBtns[stepIndex]?.dataset.strum || "down";
-      if(dir !== "mute"){
+      if(dir === "down&down"){
+        playStrum("down", time);
+        playStrum("down", time + (60.0 / tempo / 4));  // half of 1/8 note = 1/16
+      } else if(dir === "down&up"){
+        playStrum("down", time);
+        playStrum("up", time + (60.0 / tempo / 4));
+      } else if(dir !== "mute"){
         playStrum(dir, time);
       }
       window.requestAnimationFrame(() => highlightStep(stepIndex));
@@ -126,13 +127,7 @@
     function scheduler(){
       while(nextNoteTime < audioCtx.currentTime + scheduleAheadTime){
         scheduleNote(currentStep, nextNoteTime);
-        const beatNum = Math.floor(currentStep / 2) + 1;
-        const eighth = (currentStep % 2) + 1;
-        if(statusEl){
-          const s = noteBtns[currentStep]?.dataset.strum;
-          const sound = s === "up" ? "di" : s === "down" ? "da" : "—";
-          statusEl.textContent = `Beat ${beatNum} — note ${eighth}/8 · ${sound}`;
-        }
+        
         nextNote();
       }
     }
@@ -153,8 +148,7 @@
       currentStep = 0;
       nextNoteTime = audioCtx.currentTime + 0.05;
       timerID = window.setInterval(scheduler, lookahead);
-      if(statusEl) statusEl.textContent = `Playing at ${tempo} BPM`;
-    }
+          }
 
     function stop(){
       if(!isRunning) return;
@@ -163,8 +157,7 @@
       stopBtn.disabled = true;
       if(timerID){ clearInterval(timerID); timerID = null; }
       noteWraps.forEach(w => w.classList.remove("active"));
-      if(statusEl) statusEl.textContent = "Stopped";
-    }
+          }
 
     // UI wiring
     startBtn.addEventListener("click", start);
@@ -209,3 +202,4 @@
 
   waitForAppReady();
 })();
+
